@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Book 7 Flashcards – Ch. 1–4</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #f5f2eb;
+    --surface: #fffef9;
+    --border: #ddd8cc;
+    --text: #1a1812;
+    --muted: #7a7469;
+    --hint: #b0aa9e;
+    --accent: #2d5a27;
+    --accent-light: #eaf3e8;
+    --danger: #8b2020;
+    --danger-light: #fdf0f0;
+    --info: #1a3a6b;
+    --info-light: #eef2fb;
+    --amber: #7a4f10;
+    --amber-light: #fdf5e6;
+    --radius: 14px;
+    --font-display: 'DM Serif Display', serif;
+    --font-body: 'DM Sans', sans-serif;
+  }
+  body { font-family: var(--font-body); background: var(--bg); color: var(--text); min-height: 100vh; }
+
+  header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 1rem 1.5rem; display: flex; align-items: center; gap: 12px; }
+  header h1 { font-family: var(--font-display); font-size: 20px; color: var(--text); }
+  header span { font-size: 12px; color: var(--muted); background: var(--bg); border: 1px solid var(--border); border-radius: 999px; padding: 3px 10px; }
+
+  .nav { display: flex; background: var(--surface); border-bottom: 1px solid var(--border); padding: 0 1.5rem; gap: 2px; }
+  .nav button { font-family: var(--font-body); font-size: 14px; padding: 12px 18px; border: none; background: transparent; color: var(--muted); cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.15s; font-weight: 500; }
+  .nav button.active { color: var(--text); border-bottom-color: var(--text); }
+  .nav button:hover:not(.active) { color: var(--text); background: var(--bg); }
+
+  .main { max-width: 680px; margin: 0 auto; padding: 2rem 1.5rem; }
+  .screen { display: none; }
+  .screen.active { display: block; }
+
+  /* LEARN */
+  .progress-bar { height: 5px; background: var(--border); border-radius: 3px; margin-bottom: 10px; overflow: hidden; }
+  .progress-fill { height: 100%; background: var(--accent); border-radius: 3px; transition: width 0.4s ease; }
+  .counter { font-size: 13px; color: var(--muted); margin-bottom: 1.5rem; }
+
+  .card-wrap { perspective: 1200px; width: 100%; height: 240px; cursor: pointer; margin-bottom: 1.25rem; }
+  .card-inner { position: relative; width: 100%; height: 100%; transform-style: preserve-3d; transition: transform 0.45s cubic-bezier(.4,.2,.2,1); }
+  .card-wrap.flipped .card-inner { transform: rotateY(180deg); }
+  .card-face { position: absolute; inset: 0; backface-visibility: hidden; border-radius: var(--radius); border: 1px solid var(--border); background: var(--surface); display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2rem; text-align: center; }
+  .card-back { transform: rotateY(180deg); background: #fafff9; border-color: #c8ddc5; }
+  .card-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--hint); margin-bottom: 10px; }
+  .card-badge { font-size: 11px; padding: 3px 10px; border-radius: 999px; margin-bottom: 12px; }
+  .badge-term { background: var(--info-light); color: var(--info); }
+  .badge-vocab { background: var(--amber-light); color: var(--amber); }
+  .card-term { font-family: var(--font-display); font-size: 26px; color: var(--text); line-height: 1.3; }
+  .card-def { font-size: 15px; color: #3a3830; line-height: 1.65; }
+  .card-hint { font-size: 12px; color: var(--hint); margin-top: 1.5rem; }
+
+  .btn-row { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+  .btn { font-family: var(--font-body); padding: 10px 24px; border-radius: 999px; border: 1px solid var(--border); background: var(--surface); color: var(--text); font-size: 14px; cursor: pointer; font-weight: 500; transition: all 0.15s; }
+  .btn:hover { background: var(--bg); }
+  .btn.primary { background: var(--text); color: var(--surface); border-color: var(--text); }
+  .btn.primary:hover { opacity: 0.85; }
+  .btn.success { background: var(--accent-light); color: var(--accent); border-color: #b2d4ae; }
+  .btn.success:hover { background: #d9edd7; }
+  .btn.danger { background: var(--danger-light); color: var(--danger); border-color: #e8b8b8; }
+  .btn.danger:hover { background: #fde0e0; }
+
+  .done-wrap { text-align: center; padding: 3rem 1rem; }
+  .done-wrap h2 { font-family: var(--font-display); font-size: 28px; margin-bottom: 10px; }
+  .done-wrap p { color: var(--muted); margin-bottom: 2rem; font-size: 15px; }
+
+  /* QUIZ */
+  .quiz-q { font-family: var(--font-display); font-size: 22px; color: var(--text); margin-bottom: 1.5rem; line-height: 1.45; }
+  .quiz-opts { display: flex; flex-direction: column; gap: 10px; margin-bottom: 1rem; }
+  .quiz-opt { font-family: var(--font-body); padding: 13px 18px; border-radius: var(--radius); border: 1px solid var(--border); background: var(--surface); color: var(--text); font-size: 14px; cursor: pointer; text-align: left; transition: all 0.15s; line-height: 1.5; }
+  .quiz-opt:hover:not(:disabled) { background: var(--bg); border-color: #bbb5a8; }
+  .quiz-opt.correct { background: var(--accent-light); color: var(--accent); border-color: #b2d4ae; }
+  .quiz-opt.wrong { background: var(--danger-light); color: var(--danger); border-color: #e8b8b8; }
+  .quiz-opt:disabled { cursor: default; }
+  .quiz-fb { font-size: 14px; color: var(--muted); min-height: 1.4em; margin-bottom: 1rem; }
+
+  .score-row { display: flex; gap: 12px; margin-bottom: 2rem; }
+  .score-card { flex: 1; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px; text-align: center; }
+  .score-num { font-family: var(--font-display); font-size: 28px; color: var(--text); }
+  .score-lbl { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+  /* BROWSE */
+  .search-box { width: 100%; padding: 10px 16px; border-radius: 999px; border: 1px solid var(--border); background: var(--surface); color: var(--text); font-size: 14px; font-family: var(--font-body); margin-bottom: 1rem; outline: none; }
+  .search-box:focus { border-color: #999490; }
+  .filter-row { display: flex; gap: 8px; margin-bottom: 1.25rem; flex-wrap: wrap; }
+  .filter-btn { font-family: var(--font-body); font-size: 12px; padding: 6px 14px; border-radius: 999px; border: 1px solid var(--border); background: transparent; color: var(--muted); cursor: pointer; transition: all 0.15s; }
+  .filter-btn.active { background: var(--text); color: var(--surface); border-color: var(--text); }
+  .browse-list { display: flex; flex-direction: column; gap: 8px; }
+  .browse-item { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 13px 16px; }
+  .browse-term { font-weight: 600; font-size: 14px; color: var(--text); }
+  .browse-def { font-size: 13px; color: var(--muted); margin-top: 5px; line-height: 1.55; }
+  .browse-badge { display: inline-block; font-size: 10px; padding: 2px 9px; border-radius: 999px; margin-top: 7px; }
+
+  /* MISTAKES */
+  .mistakes-empty { text-align: center; padding: 4rem 1rem; color: var(--muted); }
+  .mistakes-empty .icon { font-size: 48px; margin-bottom: 12px; }
+  .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
+  .section-title { font-size: 13px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
+
+  @media (max-width: 480px) {
+    .nav button { font-size: 12px; padding: 10px 12px; }
+    .card-term { font-size: 22px; }
+    .quiz-q { font-size: 18px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Book 7 Flashcards</h1>
+  <span>Ch. 1–4 &nbsp;·&nbsp; 62 cards</span>
+</header>
+
+<nav class="nav">
+  <button class="active" onclick="showScreen('learn')">📖 Learn</button>
+  <button onclick="showScreen('quiz')">❓ Quiz</button>
+  <button onclick="showScreen('mistakes')">⚠️ Mistakes</button>
+  <button onclick="showScreen('browse')">📋 Browse</button>
+</nav>
+
+<div class="main">
+  <div id="screen-learn" class="screen active"></div>
+  <div id="screen-quiz" class="screen"></div>
+  <div id="screen-mistakes" class="screen"></div>
+  <div id="screen-browse" class="screen"></div>
+</div>
+
+<script>
+const ALL = [
+  {term:"Travelogue",def:"Writing, talk or film about travel or a particular person's travels",type:"term"},
+  {term:"Simile",def:"A comparison between two things that uses the words 'as' or 'like' (e.g. Our garden is like a jungle)",type:"term"},
+  {term:"Metaphor",def:"A type of comparison that describes one thing as if it is something else (e.g. Our garden is a jungle)",type:"term"},
+  {term:"Personification",def:"When an object is described as if it has human characteristics (e.g. Our garden swallowed a lawnmower)",type:"term"},
+  {term:"Connotations",def:"The ideas and emotions associated with a word (e.g. red is often associated with romance or anger)",type:"term"},
+  {term:"Atmosphere",def:"The mood or feeling associated with a place or setting",type:"term"},
+  {term:"Implicit",def:"Meaning that is suggested or implied, but not stated directly",type:"term"},
+  {term:"Symbolism",def:"Using an object or image to represent a feeling or idea",type:"term"},
+  {term:"Onomatopoeia",def:"When the sound of a word helps the reader imagine the setting",type:"term"},
+  {term:"Synonym",def:"A word that is identical or close in meaning to another one (e.g. wet/damp)",type:"term"},
+  {term:"Skim",def:"To run your eyes quickly over a text to understand the main points without reading every word",type:"term"},
+  {term:"Scan",def:"To use key words to find specific information in a text",type:"term"},
+  {term:"Modal verbs",def:"Auxiliary verbs that express necessity or possibility e.g. 'must', 'shall', 'will', 'should', 'would', 'can', 'could', 'may', 'might'",type:"term"},
+  {term:"Bias",def:"A preference for a particular opinion or viewpoint",type:"term"},
+  {term:"Formal language",def:"Language and style that is suitable for a serious occasion or purpose",type:"term"},
+  {term:"Informal language",def:"Language and style that is suitable for more relaxed occasions",type:"term"},
+  {term:"Minor sentence",def:"A grammatically incomplete sentence",type:"term"},
+  {term:"Direct speech",def:"The words that are actually spoken, presented with speech marks",type:"term"},
+  {term:"Indirect speech",def:"Words that sum up what was said (also called reported speech)",type:"term"},
+  {term:"Standfirst",def:"An introductory paragraph in an article that summarizes the article",type:"term"},
+  {term:"Connective",def:"A word or phrase used to link parts of a sentence or to show connection between two paragraphs",type:"term"},
+  {term:"Literal",def:"The most basic or usual meaning of a word; its explicit meaning",type:"term"},
+  {term:"Explicit",def:"Obvious or straightforward",type:"term"},
+  {term:"Imply",def:"To suggest something without stating it directly",type:"term"},
+  {term:"Chairperson",def:"The leader of a group discussion or meeting",type:"term"},
+  {term:"Rhetorical question",def:"A question used to make people think, rather than requiring an answer",type:"term"},
+  {term:"Complex sentence",def:"A sentence that contains a supporting idea (subordinate clause) in addition to the main clause",type:"term"},
+  {term:"Subordinating conjunction",def:"A word used to link clauses in a complex sentence (e.g. 'although', 'while', 'when', 'if')",type:"term"},
+  {term:"Preposition",def:"A word indicating the relationship of one thing to another (e.g. 'for', 'in', 'by')",type:"term"},
+  {term:"Alliteration",def:"When consonant sounds are repeated at the start of phrases or lines",type:"term"},
+  {term:"Suspense",def:"A feeling of excited or anxious uncertainty",type:"term"},
+  {term:"Narrative",def:"A tale or story",type:"term"},
+  {term:"Resolution",def:"The solution to or end of the problems characters face in a story",type:"term"},
+  {term:"Withheld information",def:"Facts or details that are not revealed to a reader",type:"term"},
+  {term:"Style",def:"The particular way a story is told",type:"term"},
+  {term:"Gesture",def:"A specific movement that signals a particular meaning (e.g. scratching your head or waving)",type:"term"},
+  {term:"Anthology",def:"A collection of pieces of writing",type:"term"},
+  {term:"Protagonist",def:"The main character in a story whose journey readers follow",type:"term"},
+  {term:"Minor characters",def:"Characters who are not important to the main action",type:"term"},
+  {term:"Antagonist",def:"Someone who opposes the main character in a story",type:"term"},
+  {term:"Curfew",def:"A law stating that people must stay in their homes after a particular time in the evening",type:"vocab"},
+  {term:"Confetti",def:"Small pieces of coloured paper often thrown at weddings or celebrations",type:"vocab"},
+  {term:"Antidote",def:"Remedy or cure",type:"vocab"},
+  {term:"Febrile",def:"Feverish",type:"vocab"},
+  {term:"Craning",def:"Stretching to see better",type:"vocab"},
+  {term:"Char",def:"A French word for a decorated float, or moving platform, used as part of a parade",type:"vocab"},
+  {term:"Subsidence",def:"When the ground under a building sinks",type:"vocab"},
+  {term:"Chock-full",def:"Extremely full (slang)",type:"vocab"},
+  {term:"Ingested",def:"Swallowed or absorbed into the body",type:"vocab"},
+  {term:"Oryx",def:"A large African antelope with straight, nearly upright horns",type:"vocab"},
+  {term:"Neutered",def:"When an animal has had an operation so that it cannot have babies",type:"vocab"},
+  {term:"Lameness",def:"Being unable to walk properly, due to weakness or injury to the legs",type:"vocab"},
+  {term:"Bracken",def:"A common forest plant – a fern",type:"vocab"},
+  {term:"Dock leaf",def:"The leaf of a type of large weed",type:"vocab"},
+  {term:"Smugglers",def:"People who transport goods from one country to another without paying taxes",type:"vocab"},
+  {term:"Out of countenance",def:"Unpleasantly surprised",type:"vocab"},
+  {term:"Stature",def:"Height",type:"vocab"},
+  {term:"Millstone",def:"A very heavy stone or block",type:"vocab"},
+  {term:"Guinea",def:"A coin partly made from gold",type:"vocab"},
+  {term:"Commuters",def:"People travelling to work from the suburbs",type:"vocab"},
+  {term:"Metro",def:"The Paris underground railway system",type:"vocab"},
+  {term:"Architect",def:"Someone who designs buildings",type:"vocab"},
+];
+
+function shuffle(arr){ return [...arr].sort(()=>Math.random()-0.5); }
+
+let learnDeck=[], learnIdx=0, learnFlipped=false;
+let quizDeck=[], quizIdx=0, quizScore=0, quizAnswered=false;
+let mistakes=[];
+let browseFilter='all', browseSearch='';
+
+function showScreen(name){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active'));
+  document.getElementById('screen-'+name).classList.add('active');
+  const idx=['learn','quiz','mistakes','browse'].indexOf(name);
+  document.querySelectorAll('.nav button')[idx].classList.add('active');
+  if(name==='learn') renderLearn();
+  if(name==='quiz') renderQuiz();
+  if(name==='mistakes') renderMistakes();
+  if(name==='browse') renderBrowse();
+}
+
+/* ---- LEARN ---- */
+function startLearn(){
+  learnDeck=shuffle(ALL); learnIdx=0; learnFlipped=false; renderLearn();
+}
+function renderLearn(){
+  const el=document.getElementById('screen-learn');
+  if(!learnDeck.length){
+    el.innerHTML=`<div class="done-wrap"><h2>Ready to study?</h2><p>Flip each card to reveal its definition,<br>then mark whether you got it right.</p><button class="btn primary" onclick="startLearn()">Start studying</button></div>`;
+    return;
+  }
+  if(learnIdx>=learnDeck.length){
+    el.innerHTML=`<div class="done-wrap"><h2>All done! 🎉</h2><p>You went through all ${learnDeck.length} cards.</p><div class="btn-row"><button class="btn" onclick="startLearn()">Study again</button><button class="btn primary" onclick="showScreen('quiz')">Take a quiz →</button></div></div>`;
+    return;
+  }
+  const c=learnDeck[learnIdx];
+  const pct=Math.round((learnIdx/learnDeck.length)*100);
+  el.innerHTML=`
+    <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
+    <div class="counter">${learnIdx+1} of ${learnDeck.length}</div>
+    <div class="card-wrap" id="lcard" onclick="flipLearn()">
+      <div class="card-inner">
+        <div class="card-face">
+          <div class="card-label">Term</div>
+          <div class="card-badge ${c.type==='term'?'badge-term':'badge-vocab'}">${c.type==='term'?'Key term':'Vocabulary'}</div>
+          <div class="card-term">${c.term}</div>
+          <div class="card-hint">Click to reveal definition</div>
+        </div>
+        <div class="card-face card-back">
+          <div class="card-label">Definition</div>
+          <div class="card-def">${c.def}</div>
+        </div>
+      </div>
+    </div>
+    <div class="btn-row" id="learn-actions" style="display:none">
+      <button class="btn danger" onclick="markLearn(false)">✗ Still learning</button>
+      <button class="btn success" onclick="markLearn(true)">✓ Got it</button>
+    </div>
+    <div class="btn-row" id="learn-skip">
+      <button class="btn" onclick="markLearn(true)" style="color:var(--muted)">Skip →</button>
+    </div>
+  `;
+}
+function flipLearn(){
+  learnFlipped=!learnFlipped;
+  document.getElementById('lcard').classList.toggle('flipped',learnFlipped);
+  if(learnFlipped){
+    document.getElementById('learn-actions').style.display='flex';
+    document.getElementById('learn-skip').style.display='none';
+  }
+}
+function markLearn(knew){
+  if(!knew){
+    const c=learnDeck[learnIdx];
+    if(!mistakes.find(m=>m.term===c.term)) mistakes.push({...c});
+  }
+  learnIdx++; learnFlipped=false; renderLearn();
+}
+
+/* ---- QUIZ ---- */
+function startQuiz(){
+  quizDeck=shuffle(ALL); quizIdx=0; quizScore=0; quizAnswered=false; renderQuiz();
+}
+function renderQuiz(){
+  const el=document.getElementById('screen-quiz');
+  if(!quizDeck.length){
+    el.innerHTML=`<div class="done-wrap"><h2>Quiz mode</h2><p>Answer multiple-choice questions on all ${ALL.length} cards.</p><button class="btn primary" onclick="startQuiz()">Start quiz</button></div>`;
+    return;
+  }
+  if(quizIdx>=quizDeck.length){
+    const pct=Math.round((quizScore/quizDeck.length)*100);
+    el.innerHTML=`<div class="done-wrap">
+      <h2>Quiz complete!</h2>
+      <div class="score-row">
+        <div class="score-card"><div class="score-num">${quizScore}</div><div class="score-lbl">Correct</div></div>
+        <div class="score-card"><div class="score-num">${quizDeck.length-quizScore}</div><div class="score-lbl">Wrong</div></div>
+        <div class="score-card"><div class="score-num">${pct}%</div><div class="score-lbl">Score</div></div>
+      </div>
+      <div class="btn-row"><button class="btn" onclick="startQuiz()">Try again</button><button class="btn primary" onclick="showScreen('mistakes')">View mistakes →</button></div>
+    </div>`;
+    return;
+  }
+  const c=quizDeck[quizIdx];
+  const others=shuffle(ALL.filter(x=>x.term!==c.term)).slice(0,3);
+  const opts=shuffle([c,...others]);
+  const pct=Math.round((quizIdx/quizDeck.length)*100);
+  el.innerHTML=`
+    <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
+    <div class="counter">${quizIdx+1} of ${quizDeck.length} &nbsp;·&nbsp; <span style="color:var(--accent)">${quizScore} correct</span></div>
+    <div class="quiz-q">What does "<em>${c.term}</em>" mean?</div>
+    <div class="quiz-opts">
+      ${opts.map((o,i)=>`<button class="quiz-opt" id="qo${i}" onclick="answerQuiz(${i},${o.term===c.term})">${o.def}</button>`).join('')}
+    </div>
+    <div class="quiz-fb" id="qfb"></div>
+    <div id="qnext" style="display:none"><button class="btn primary" onclick="nextQuiz()">Next →</button></div>
+  `;
+}
+function answerQuiz(idx,correct){
+  if(quizAnswered) return;
+  quizAnswered=true;
+  const c=quizDeck[quizIdx];
+  document.querySelectorAll('.quiz-opt').forEach(b=>b.disabled=true);
+  const chosen=document.getElementById('qo'+idx);
+  if(correct){
+    chosen.classList.add('correct');
+    quizScore++;
+    document.getElementById('qfb').textContent='Correct! ✓';
+  } else {
+    chosen.classList.add('wrong');
+    document.getElementById('qfb').textContent='Not quite. The correct answer is highlighted.';
+    document.querySelectorAll('.quiz-opt').forEach(b=>{ if(b.textContent===c.def) b.classList.add('correct'); });
+    if(!mistakes.find(m=>m.term===c.term)) mistakes.push({...c});
+  }
+  document.getElementById('qnext').style.display='block';
+}
+function nextQuiz(){ quizIdx++; quizAnswered=false; renderQuiz(); }
+
+/* ---- MISTAKES ---- */
+function renderMistakes(){
+  const el=document.getElementById('screen-mistakes');
+  if(!mistakes.length){
+    el.innerHTML=`<div class="mistakes-empty"><div class="icon">😊</div><p>No mistakes yet!<br>Study or take a quiz to track errors.</p></div>`;
+    return;
+  }
+  el.innerHTML=`
+    <div class="section-header">
+      <div class="section-title">${mistakes.length} term${mistakes.length>1?'s':''} to review</div>
+      <button class="btn" style="font-size:12px;padding:6px 14px" onclick="clearMistakes()">Clear all</button>
+    </div>
+    <div class="browse-list">
+      ${mistakes.map(m=>`<div class="browse-item">
+        <div class="browse-term">${m.term}</div>
+        <div class="browse-def">${m.def}</div>
+        <span class="browse-badge ${m.type==='term'?'badge-term':'badge-vocab'}">${m.type==='term'?'Key term':'Vocabulary'}</span>
+      </div>`).join('')}
+    </div>
+    <div style="margin-top:1.5rem" class="btn-row">
+      <button class="btn primary" onclick="studyMistakes()">Study these cards</button>
+    </div>
+  `;
+}
+function clearMistakes(){ mistakes=[]; renderMistakes(); }
+function studyMistakes(){ learnDeck=shuffle(mistakes); learnIdx=0; learnFlipped=false; showScreen('learn'); }
+
+/* ---- BROWSE ---- */
+function renderBrowse(){
+  const el=document.getElementById('screen-browse');
+  const filtered=ALL.filter(c=>{
+    const mt=browseFilter==='all'||(browseFilter==='term'&&c.type==='term')||(browseFilter==='vocab'&&c.type==='vocab');
+    const ms=browseSearch===''||c.term.toLowerCase().includes(browseSearch.toLowerCase())||c.def.toLowerCase().includes(browseSearch.toLowerCase());
+    return mt&&ms;
+  });
+  el.innerHTML=`
+    <input class="search-box" type="text" placeholder="Search terms or definitions…" value="${browseSearch.replace(/"/g,'&quot;')}" oninput="setBrowseSearch(this.value)">
+    <div class="filter-row">
+      <button class="filter-btn ${browseFilter==='all'?'active':''}" onclick="setBrowseFilter('all')">All (${ALL.length})</button>
+      <button class="filter-btn ${browseFilter==='term'?'active':''}" onclick="setBrowseFilter('term')">Key terms (${ALL.filter(c=>c.type==='term').length})</button>
+      <button class="filter-btn ${browseFilter==='vocab'?'active':''}" onclick="setBrowseFilter('vocab')">Vocabulary (${ALL.filter(c=>c.type==='vocab').length})</button>
+    </div>
+    <div class="browse-list">
+      ${filtered.length?filtered.map(c=>`<div class="browse-item">
+        <div class="browse-term">${c.term}</div>
+        <div class="browse-def">${c.def}</div>
+        <span class="browse-badge ${c.type==='term'?'badge-term':'badge-vocab'}">${c.type==='term'?'Key term':'Vocabulary'}</span>
+      </div>`).join(''):'<div style="text-align:center;padding:2rem;color:var(--hint)">No results found</div>'}
+    </div>
+  `;
+}
+function setBrowseFilter(f){ browseFilter=f; renderBrowse(); }
+function setBrowseSearch(v){ browseSearch=v; renderBrowse(); }
+
+renderLearn();
+</script>
+</body>
+</html>
